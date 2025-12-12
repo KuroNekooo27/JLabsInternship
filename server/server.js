@@ -60,12 +60,22 @@ app.use(cors({
 // Get user's own IP geolocation (Self)
 app.get('/api/geo/self', async (req, res) => {
     try {
+        const clientIpHeader = req.headers['x-forwarded-for'];
+        let userIp = req.socket.remoteAddress; 
+        if (clientIpHeader) {
+            userIp = clientIpHeader.split(',')[0].trim();
+        }
+
+        userIp = userIp.replace(/^::ffff:/, '').split(':')[0];
+
+
         const url = IPINFO_TOKEN
-            ? `https://ipinfo.io/json?token=${IPINFO_TOKEN}`
-            : `https://ipinfo.io/json`;
+            ? `https://ipinfo.io/${userIp}/json?token=${IPINFO_TOKEN}`
+            : `https://ipinfo.io/${userIp}/json`;
 
         const response = await axios.get(url);
         res.json(response.data);
+
     } catch (error) {
         console.error("Geo API SELF Error:", error.message);
         res.status(500).json({ error: "Failed to fetch user's geolocation" });
@@ -91,12 +101,6 @@ app.get('/api/geo/ip/:ip', async (req, res) => {
 
 app.use('/api', authRoutes);
 
-// ----------------------------------------------------------------------
-// FIX 2: Mongoose Connection Logic
-// We leave the connect block here, but Vercel requires the ENV vars to be set!
-// ----------------------------------------------------------------------
-
-// MongoDB Connection
 mongoose.connect(MONGO_URI)
     .then(() => console.log('MongoDB Connected successfully!'))
     .catch(err => console.error('MongoDB connection error:', err));
