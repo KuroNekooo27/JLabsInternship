@@ -77,11 +77,35 @@ app.get('/api/geo/ip/:ip', async (req, res) => {
 app.use('/api', authRoutes);
 
 // MongoDB Connection
-mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB Connected successfully!'))
-    .catch(err => console.error('MongoDB connection error:', err));
+// mongoose.connect(MONGO_URI)
+//     .then(() => console.log('MongoDB Connected successfully!'))
+//     .catch(err => console.error('MongoDB connection error:', err));
+
+let isConnected = false;
+async function connectToDB() {
+    try {
+        await mongoose.connect(process.envMONGO_URI,{
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    });
+    isConnected = true;
+    console.log('MongoDB Connected successfully!');
+    } catch (err) {
+        console.error('MongoDB connection error:', err);
+    }   
+        }
+
+app.use(async (req, res, next) => {
+    if (!isConnected) {
+        await connectToDB();
+    }
+    next();
+});
+
 
 // Start Server
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// app.listen(PORT, () => {
+//     console.log(`Server running on port ${PORT}`);
+// });
+
+module.exports = app;

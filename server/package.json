@@ -4,8 +4,9 @@
   "main": "server.js",
   "scripts": {
     "seed": "node seed.js",
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "vercel-start": "node server.js"
   },
   "keywords": [],
   "author": "",
