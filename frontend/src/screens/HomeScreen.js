@@ -6,7 +6,7 @@ import GeoMap from '../components/GeoMap';
 
 // Backend base URL
 // const API_BASE_URL = "http://localhost:8000/api";
-const API_BASE_URL = "https://jlabsinternsip.vercel.app";
+const API_BASE_URL = "https://jlabsinternsip.vercel.app/api";
 
 // Utility function to check IPv4
 const isValidIp = (ip) => {
