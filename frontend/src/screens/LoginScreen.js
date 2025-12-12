@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 
 // Set the base URL for the API
 // const API_URL = 'http://localhost:8000/api/login'; 
-const API_URL = ''; 
+const API_URL = 'https://jlabsinternsip.vercel.app'; 
 
 const LoginScreen = () => {
     const [email, setEmail] = useState('');
