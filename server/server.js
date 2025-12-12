@@ -7,28 +7,44 @@ const axios = require('axios');
 
 const app = express();
 
-// Access environment variables
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8000;
 const MONGO_URI = process.env.MONGO_URI;
 const IPINFO_TOKEN = process.env.IPINFO_TOKEN;
 
 // Routes
 const authRoutes = require('./routes/auth');
 
+
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://localhost:3001', 
+    process.env.FRONTEND_URL,
+];
+
 // Middleware
 app.use(express.json());
-app.use(
-    cors({
-        origin: "*",
-        methods: ["GET", "POST", "PUT", "DELETE"], 
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
-    })
-);
 
-// Get user's own IP geolocation
+app.use(cors({
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true); 
+        
+        if (allowedOrigins.includes(origin)) {
+            callback(null, true); // Origin is allowed
+        } else {
+            console.warn(`CORS blocked request from disallowed origin: ${origin}`);
+            callback(new Error(`Not allowed by CORS policy.`), false);
+        }
+    },
+    // Explicitly allow all methods necessary for API access
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], 
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // Now allowed because 'origin' is explicitly checked
+}));
+
+// Get user's own IP geolocation (Self)
 app.get('/api/geo/self', async (req, res) => {
     try {
+        // ipinfo.io/json automatically uses the client IP
         const url = IPINFO_TOKEN
             ? `https://ipinfo.io/json?token=${IPINFO_TOKEN}`
             : `https://ipinfo.io/json`;
@@ -60,7 +76,7 @@ app.get('/api/geo/ip/:ip', async (req, res) => {
 
 app.use('/api', authRoutes);
 
-//MongoDB Connection
+// MongoDB Connection
 mongoose.connect(MONGO_URI)
     .then(() => console.log('MongoDB Connected successfully!'))
     .catch(err => console.error('MongoDB connection error:', err));
