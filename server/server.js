@@ -18,7 +18,8 @@ const authRoutes = require('./routes/auth');
 const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:3001', 
-    process.env.FRONTEND_URL,
+    "https://frontend-zeta-gilt-20.vercel.app/login",
+    "https://jlabsinternsip.vercel.app/login",
 ];
 
 // Middleware
